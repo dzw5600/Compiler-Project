@@ -1,0 +1,27 @@
+// test.cstar example
+
+/* Multi-line
+   comment test */
+
+int count = 10;
+float pi = 3.14f;
+string helloWorld = "Hello, World!";
+bool myBool = true;
+
+if (count >= 10)
+{
+    set count = count + 1;
+    char bleh = 'S';
+}
+else
+{
+    set count = count - 1;
+}
+
+// Check operator ambiguity
+int result = 5;
+if (result = 5)
+{
+    // blah
+}
+double d = .5; // Test starting with .
