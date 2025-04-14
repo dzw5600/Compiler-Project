@@ -3,15 +3,23 @@
 /* Multi-line
    comment test */
 
-int count = 10;
-float pi = 3.14f;
-string helloWorld = "Hello, World!";
-bool myBool = true;
+int count;
+int result;
+float pi;
+string helloWorld;
+bool myBool;
+char bleh;
+double d;
+
+set count = 10;
+set pi = 3.14f;
+set helloWorld = "Hello, World!";
+set myBool = true;
 
 if (count >= 10)
 {
     set count = count + 1;
-    char bleh = 'S';
+    set bleh = 'S';
 }
 else
 {
@@ -19,9 +27,9 @@ else
 }
 
 // Check operator ambiguity
-int result = 5;
+set result = 5;
 if (result = 5)
 {
     // blah
 }
-double d = .5; // Test starting with .
+set d = .5; // Test starting with .

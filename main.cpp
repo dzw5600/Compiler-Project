@@ -6,12 +6,15 @@
 #include <set>
 #include <algorithm>
 #include <cctype>
+#ifndef tokenizer_init
+#define tokenizer_init
 #include "tokenizer.cpp"
+#endif
+#include "parser.cpp"
 
 int main()
 {
-  std::ifstream myfile;
-  myfile.open("test.cstar");
+  std::ifstream myfile("test.cstar");
   Tokenizer tokenizer(myfile);
   Token token;
 
@@ -122,6 +125,14 @@ int main()
 //   printCategory("String Literals", stringLiterals);
 //   printCategory("Punctuation", punctuation);
 //   printCategory("Unknown Tokens", unknown);
+
+  Parser parser(tokens);
+  std::vector<ParserNode*> parsernodes = parser.parse();
+
+  for (ParserNode *node : parsernodes)
+  {
+    node->print();
+  }
 
   return 0;
 }
