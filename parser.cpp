@@ -4,9 +4,8 @@
 #include <string>
 #include "parser.h"
 
-bool DEBUG_PARSING = true;
-
-// Add this helper function for indented debug output
+// Added this helper function for indented debug output
+const bool DEBUG_PARSING = false;
 void debugPrint(const std::string& message, int depth = 0)
 {
     if (!DEBUG_PARSING) return;
@@ -339,8 +338,8 @@ void NumberNode::print(int indent)
 
 Parser::Parser(std::vector<Token> &tokens): tokens(tokens), index(0)
 {
-    
-}  
+
+}
 
 std::vector<ParserNode*> Parser::parse()
 {
