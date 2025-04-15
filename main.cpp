@@ -125,7 +125,6 @@ int main()
     Parser parser(tokens);
     std::vector<ParserNode *> parserNodes = parser.parse();
 
-    // None found currently!
     for (ParserNode *node : parserNodes)
     {
         node->print();
