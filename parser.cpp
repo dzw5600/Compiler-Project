@@ -21,6 +21,62 @@ void ParserNode::print(int indent)
     std::cout << "ParserNode\n";
 }
 
+FunctionDeclaration::FunctionDeclaration(std::string name, std::vector<std::string> parameters, std::vector<ParserNode*> body)
+{
+    this->name = name;
+    this->parameters = parameters;
+    this->body = body;
+}
+void FunctionDeclaration::print(int indent)
+{
+    for (int i = 0; i < indent; i++)
+    {
+        std::cout << "  ";
+    }
+    std::cout << "FunctionDeclNode: " << name << std::endl;
+    for (int i = 0; i < indent+1; i++)
+    {
+        std::cout << "  ";
+    }
+    std::cout << "Parameters:" << std::endl;
+    for (std::string param : parameters) 
+    {
+        for (int i = 0; i < indent+2; i++)
+        {
+            std::cout << "  ";
+        }
+        std::cout << param << std::endl;
+    }
+    for (int i = 0; i < indent+1; i++)
+    {
+        std::cout << "  ";
+    }
+    std::cout << "Body:" << std::endl;
+    for (auto statement : body) 
+    {
+        statement->print(indent + 2);
+    }
+}
+
+FunctionCall::FunctionCall(std::string name, std::vector<ParserNode*> arguments) 
+{
+    this->name = name;
+    this->arguments = arguments;
+}
+
+void FunctionCall::print(int indent)
+{
+    for (int i = 0; i < indent; i++)
+    {
+        std::cout << "  ";
+    }
+    std::cout << "FunctionCallNode: " << name << std::endl;
+    for (auto arg : arguments) 
+    {
+        arg->print(indent + 1);
+    }
+}
+
 DeclarationNode::DeclarationNode(std::string type, std::string name)
 {
     this->type = type;
@@ -366,6 +422,71 @@ std::vector<ParserNode*> Parser::parse()
     return nodes;
 }
 
+ParserNode* Parser::parseFunctionDeclaration() 
+{
+
+}
+
+WhileLoopNode::WhileLoopNode(ParserNode* condition, std::vector<ParserNode*> statements) : condition(condition) 
+{
+    this->statements = statements;
+}
+
+void WhileLoopNode::print(int indent)  
+{
+    for (int i = 0; i < indent; i++) 
+    {
+        std::cout << "  ";
+    }
+    std::cout << "WhileNode\n";
+
+    for (int i = 0; i < indent; i++) 
+    {
+        std::cout << "  ";
+    }
+
+    std::cout << "Condition:\n";
+    condition->print(indent + 4);
+    for (int i = 0; i < indent; i++) 
+    {
+        std::cout << "  ";
+    }
+    std::cout << "Statements:\n";
+    for (auto statement : statements) 
+    {
+        statement->print(indent + 4);
+    }
+}
+
+ParserNode *Parser::parseWhileLoop() {
+    index++;
+    if (tokens[index].text != "(")
+    {
+        std::cerr << "Expected '('\n";
+    }
+    ParserNode *condition = Parser::expression(); 
+    if (tokens[index].text != ")")
+    {
+        std::cerr << "Expected ')'\n";
+        return nullptr;
+    }
+
+    if (tokens[index].text != "{")
+    {
+        std::cerr << "Expected '{'\n";
+        return nullptr;
+    }
+    std::vector<ParserNode*> body;
+    while (tokens[index].text != "}")
+    {
+        body.push_back(parseStatement());
+    }
+    index++;
+
+    return new WhileLoopNode(condition, body);
+}
+
+
 ParserNode* Parser::parseDeclaration()
 {
     debugPrint("Parsing declaration", 1);
@@ -451,6 +572,10 @@ ParserNode* Parser::parseStatement()
     {
         debugPrint("Found assignment statement", 2);
         return parseAssignment();
+    }
+    else if (tokens[index].text == "while")
+    {
+        return Parser::parseWhileLoop();
     }
     else if (tokens[index].type == TokenType::DATA_TYPE)
     {

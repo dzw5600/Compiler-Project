@@ -38,6 +38,38 @@ enum OperatorType
 	Not
 };
 
+class WhileLoopNode : public ParserNode
+{
+public:
+	ParserNode *condition;
+	std::vector<ParserNode*> statements;
+
+	WhileLoopNode(ParserNode *condition, std::vector<ParserNode*> statements);
+	void print(int indent = 0) override;
+};
+
+
+class FunctionDeclaration : public ParserNode
+{
+public:
+	std::string name;
+	std::vector<std::string> parameters;
+	std::vector<ParserNode*> body;
+
+	FunctionDeclaration(std::string name, std::vector<std::string> parameters, std::vector<ParserNode*> body);
+	void print(int indent = 0) override;
+};
+
+class FunctionCall : public ParserNode
+{
+public:
+	std::string name;
+	std::vector<ParserNode*> arguments;
+
+	FunctionCall(std::string name, std::vector<ParserNode*> arguments);
+	void print(int indent = 0) override;
+};
+
 class DeclarationNode : public ParserNode
 {
 public:
@@ -154,6 +186,8 @@ public:
 	ParserNode *term();
 	ParserNode *comparison();
 	ParserNode *logic();
+	ParserNode *parseFunctionDeclaration();
+	ParserNode *parseWhileLoop();
 };
 
 #endif // PARSER_H
