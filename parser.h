@@ -48,7 +48,6 @@ public:
 	void print(int indent = 0) override;
 };
 
-
 class FunctionDeclaration : public ParserNode
 {
 public:
@@ -75,8 +74,9 @@ class DeclarationNode : public ParserNode
 public:
 	std::string type;
 	std::string name;
+	ParserNode* value = nullptr; // ✅ optional
 
-	DeclarationNode(std::string type, std::string name);
+	DeclarationNode(std::string type, std::string name, ParserNode* value = nullptr);
 	void print(int indent = 0) override;
 };
 
@@ -175,6 +175,33 @@ public:
 	void print(int indent = 0) override;
 };
 
+// ====== Switch/Case AST Support ======
+class CaseNode : public ParserNode
+{
+public:
+	ParserNode* value; // nullptr for default
+	std::vector<ParserNode*> body;
+
+	CaseNode(ParserNode* value, std::vector<ParserNode*> body);
+	void print(int indent = 0) override;
+};
+
+class SwitchNode : public ParserNode
+{
+public:
+	ParserNode* condition;
+	std::vector<CaseNode*> cases;
+
+	SwitchNode(ParserNode* condition, std::vector<CaseNode*> cases);
+	void print(int indent = 0) override;
+};
+
+// ====== Break Node Support ======
+class BreakNode : public ParserNode
+{
+public:
+	void print(int indent = 0) override;
+};
 // Parser class
 class Parser
 {
@@ -198,6 +225,7 @@ public:
 	ParserNode *logic();
 	ParserNode *parseFunctionDeclaration();
 	ParserNode *parseWhileLoop();
+	ParserNode *parseSwitch(); // switch/case support
 };
 
 #endif // PARSER_H

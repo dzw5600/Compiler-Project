@@ -77,19 +77,24 @@ void FunctionCall::print(int indent)
     }
 }
 
-DeclarationNode::DeclarationNode(std::string type, std::string name)
+DeclarationNode::DeclarationNode(std::string type, std::string name, ParserNode* value)
 {
-    this->type = type;
-    this->name = name;
+	this->type = type;
+	this->name = name;
+	this->value = value;
 }
 
 void DeclarationNode::print(int indent) 
 {
-    for (int i = 0; i < indent; i++)
-    {
-        std::cout << "  ";
-    }
-    std::cout << "Declaration: " << type << " " << name << "\n";
+	for (int i = 0; i < indent; i++)
+		std::cout << "  ";
+	std::cout << "Declaration: " << type << " " << name;
+	if (value != nullptr) {
+		std::cout << " = ";
+		value->print(0);
+	} else {
+		std::cout << "\n";
+	}
 }
 
 VariableNode::VariableNode(Token varTok)
@@ -163,6 +168,7 @@ void IfNode::print(int indent)
         }
     }
 }  
+
 PrintNode::PrintNode(Token token)
 {
     this->token = token; // Assign token
@@ -173,6 +179,42 @@ void PrintNode::print(int indent)
     for (int i = 0; i < indent; i++)
         std::cout << "  ";
     std::cout << "Print: " << token.text << "\n";
+}
+
+CaseNode::CaseNode(ParserNode* value, std::vector<ParserNode*> body)
+    : value(value), body(body) {}
+
+void CaseNode::print(int indent) {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "Case:\n";
+    if (value)
+        value->print(indent + 1);
+    else {
+        for (int i = 0; i < indent + 1; i++) std::cout << "  ";
+        std::cout << "Default\n";
+    }
+    for (auto& stmt : body)
+        stmt->print(indent + 1);
+}
+
+void BreakNode::print(int indent)
+{
+	for (int i = 0; i < indent; i++)
+		std::cout << "  ";
+	std::cout << "Break\n";
+}
+    
+SwitchNode::SwitchNode(ParserNode* condition, std::vector<CaseNode*> cases)
+    : condition(condition), cases(cases) {}
+
+void SwitchNode::print(int indent) {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "Switch:\n";
+    for (int i = 0; i < indent + 1; i++) std::cout << "  ";
+    std::cout << "Condition:\n";
+    condition->print(indent + 2);
+    for (auto& c : cases)
+        c->print(indent + 1);
 }
 BooleanNode::BooleanNode(Token token) 
 {
@@ -496,34 +538,103 @@ ParserNode *Parser::parseWhileLoop() {
     return new WhileLoopNode(condition, body);
 }
 
+ParserNode* Parser::parseSwitch() {
+    index++; // skip 'switch'
+
+    if (tokens[index].text != "(") {
+        std::cerr << "Expected '('\n";
+        return nullptr;
+    }
+    index++;
+    ParserNode* condition = expression();
+    if (tokens[index].text != ")") {
+        std::cerr << "Expected ')'\n";
+        return nullptr;
+    }
+    index++;
+
+    if (tokens[index].text != "{") {
+        std::cerr << "Expected '{' after switch condition\n";
+        return nullptr;
+    }
+    index++; // skip '{'
+
+    std::vector<CaseNode*> caseList;
+    while (tokens[index].text != "}") {
+        if (tokens[index].text == "case") {
+            index++; // skip 'case'
+            ParserNode* value = expression();
+            if (tokens[index].text != ":") {
+                std::cerr << "Expected ':' after case value\n";
+                return nullptr;
+            }
+            index++;
+
+            std::vector<ParserNode*> caseBody;
+            while (tokens[index].text != "case" && tokens[index].text != "default" && tokens[index].text != "}") {
+                caseBody.push_back(parseStatement());
+            }
+
+            caseList.push_back(new CaseNode(value, caseBody));
+        }
+        else if (tokens[index].text == "default") {
+            index++; // skip 'default'
+            if (tokens[index].text != ":") {
+                std::cerr << "Expected ':' after default\n";
+                return nullptr;
+            }
+            index++;
+
+            std::vector<ParserNode*> caseBody;
+            while (tokens[index].text != "case" && tokens[index].text != "}" && tokens[index].text != "default") {
+                caseBody.push_back(parseStatement());
+            }
+
+            caseList.push_back(new CaseNode(nullptr, caseBody));
+        }
+        else {
+            std::cerr << "Expected 'case' or 'default'\n";
+            return nullptr;
+        }
+    }
+
+    index++; // skip '}'
+    return new SwitchNode(condition, caseList);
+}
 
 ParserNode* Parser::parseDeclaration()
 {
-    debugPrint("Parsing declaration", 1);
+	debugPrint("Parsing declaration", 1);
 
-    std::string type = tokens[index].text;
-    debugPrint("Type: " + type, 1);
-    index++;
+	std::string type = tokens[index].text;
+	index++;
 
-    Token identifier = tokens[index];
-    if (identifier.type != TokenType::IDENTIFIER)
-    {
-        std::cerr << "Expected variable name\n";
-        return nullptr;
-    }
-    std::string varName = identifier.text;
-    debugPrint("Variable name: " + varName, 2);
-    index++;
+	Token identifier = tokens[index];
+	if (identifier.type != TokenType::IDENTIFIER)
+	{
+		std::cerr << "Expected variable name\n";
+		return nullptr;
+	}
+	std::string varName = identifier.text;
+	index++;
 
-    if (tokens[index].text != ";")
-    {
-        std::cerr << "Expected ';'";
-        return nullptr;
-    }
-    index++;
+	ParserNode* value = nullptr;
 
-    debugPrint("Created declaration node: " + type + " " + varName, 2);
-    return new DeclarationNode(type, varName);
+	// Check for optional initializer
+	if (tokens[index].text == "=")
+	{
+		index++; // skip '='
+		value = expression();
+	}
+
+	if (tokens[index].text != ";")
+	{
+		std::cerr << "Expected ';'\n";
+		return nullptr;
+	}
+	index++;
+
+	return new DeclarationNode(type, varName, value);
 }
 
 ParserNode* Parser::parsePrint()
@@ -644,11 +755,26 @@ ParserNode* Parser::parseStatement()
     {
         return parsePrint();
     }
+    else if (tokens[index].text == "switch")
+    {
+        debugPrint("Found switch statement", 2);
+        return parseSwitch();
+    }
     else if (tokens[index].type == TokenType::DATA_TYPE)
     {
         debugPrint("Found variable declaration", 2);
         return parseDeclaration();
-    }    
+    }   
+    else if (tokens[index].text == "break")
+    {
+        index++;
+        if (tokens[index].text != ";") {
+            std::cerr << "Expected ';' after break\n";
+            return nullptr;
+        }
+        index++;
+        return new BreakNode();
+    }
     else
     {
         std::cerr << "Invalid statement at token index " << index << ": " << tokens[index].text << std::endl;

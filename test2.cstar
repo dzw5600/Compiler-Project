@@ -21,3 +21,28 @@ print(myBool);
 print(pi);
 print(count);
 
+switch (count) {
+    case 1:
+        print("one");
+        break;
+    case 2:
+        print("two");
+        break;
+    default:
+        print("other");
+        break;
+}
+set count = 2;
+switch (count) {
+    case 1:
+        print("one");
+        break;
+    case 2:
+        print("two");
+        break;
+    default:
+        print("other");
+        break;
+}
+
+

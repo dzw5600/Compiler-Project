@@ -3,7 +3,7 @@
 /* Multi-line
    comment test */
 
-int count;
+int count = 1;
 int result;
 float pi;
 string helloWorld;
