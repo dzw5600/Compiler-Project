@@ -163,7 +163,17 @@ void IfNode::print(int indent)
         }
     }
 }  
+PrintNode::PrintNode(Token token)
+{
+    this->token = token; // Assign token
+}
 
+void PrintNode::print(int indent)
+{
+    for (int i = 0; i < indent; i++)
+        std::cout << "  ";
+    std::cout << "Print: " << token.text << "\n";
+}
 BooleanNode::BooleanNode(Token token) 
 {
     value = (token.text == "true");
@@ -492,7 +502,7 @@ ParserNode* Parser::parseDeclaration()
     debugPrint("Parsing declaration", 1);
 
     std::string type = tokens[index].text;
-    debugPrint("Type: " + type, 2);
+    debugPrint("Type: " + type, 1);
     index++;
 
     Token identifier = tokens[index];
@@ -514,6 +524,58 @@ ParserNode* Parser::parseDeclaration()
 
     debugPrint("Created declaration node: " + type + " " + varName, 2);
     return new DeclarationNode(type, varName);
+}
+
+ParserNode* Parser::parsePrint()
+{
+    debugPrint("Parsing Print statement", 1);
+
+    if (tokens[index].text != "print")
+    {
+        std::cerr << "Unable to parse print statement\n";
+        return nullptr;
+    }
+    index++;
+
+    if (tokens[index].text != "(")
+    {
+        std::cerr << "Expected '('\n";
+        return nullptr;
+    }
+    index++;
+
+    debugPrint("Parsing expression for assignment", 2);
+    Token valueToken = tokens[index]; // Save token before parsing
+    ParserNode* value = expression(); // Still parse it for validation
+
+    if (!(valueToken.type == TokenType::STRING_LITERAL || 
+        valueToken.type == TokenType::CHAR_LITERAL ||
+        valueToken.type == TokenType::INTEGER_LITERAL ||
+        valueToken.type == TokenType::FLOAT_LITERAL ||
+        valueToken.type == TokenType::IDENTIFIER ||
+        valueToken.type == TokenType::BOOL_LITERAL)) 
+    {
+      std::cerr << "Invalid token type for print statement\n";
+      return nullptr;
+    }
+
+
+    debugPrint("Expression parsed", 2);
+
+    if (tokens[index].text != ")") {
+        std::cerr << "Expected ')'\n";
+        return nullptr;
+    }
+    index++;
+    if (tokens[index].text != ";")
+    {
+        std::cerr << "Expected ';'";
+        return nullptr;
+    }
+    index++;
+    
+    debugPrint("Print statement complete", 1);
+    return new PrintNode(valueToken);
 }
 
 ParserNode* Parser::parseAssignment()
@@ -560,6 +622,7 @@ ParserNode* Parser::parseAssignment()
     return new AssignmentNode(var, value);
 }
 
+
 ParserNode* Parser::parseStatement()
 {
     debugPrint("Determining statement type", 1);
@@ -576,6 +639,10 @@ ParserNode* Parser::parseStatement()
     else if (tokens[index].text == "while")
     {
         return Parser::parseWhileLoop();
+    }
+    else if (tokens[index].text == "print")
+    {
+        return parsePrint();
     }
     else if (tokens[index].type == TokenType::DATA_TYPE)
     {

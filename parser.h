@@ -110,6 +110,15 @@ public:
 	void print(int indent = 0) override;
 };
 
+class PrintNode : public ParserNode
+{
+public:
+	Token token;
+
+	PrintNode(Token token);
+	void print(int indent = 0) override;
+};
+
 class BooleanNode : public ParserNode
 {
 public:
@@ -178,6 +187,7 @@ public:
 	std::vector<ParserNode*> parse();
 	ParserNode *parseDeclaration();
 	ParserNode *parseAssignment();
+	ParserNode *parsePrint();
 	ParserNode *parseStatement();
 	std::vector<ParserNode*> parseBlock();
 	IfNode *parseIf();

@@ -16,7 +16,7 @@ const std::set<std::string> KEYWORDS = {
     "class", "struct", "interface", "private", "protected",
     "public", "static", "true", "false", "const",
     "int", "float", "double", "char", "bool", "void",
-    "string", "new", "base", "extends"};
+    "string", "new", "base", "extends","print"};
 
 const std::set<std::string> DATA_TYPES = {"int", "float", "double", "char", "bool", "void", "string"};
 

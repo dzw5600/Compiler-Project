@@ -32,6 +32,23 @@ std::string generateStatement(ParserNode* node, int indent = 0) {
         }
         out << "\n";
     }
+    else if (auto print = dynamic_cast<PrintNode*>(node)) {
+        std::string val = print->token.text;
+        TokenType type = print->token.type;
+    
+        if (type == TokenType::STRING_LITERAL) {
+            out << ind << "std::cout << \"" << val << "\" << std::endl;\n";
+        } else if (type == TokenType::CHAR_LITERAL) {
+            out << ind << "std::cout << '" << val << "' << std::endl;\n";
+        } else if (type == TokenType::INTEGER_LITERAL ||
+                   type == TokenType::FLOAT_LITERAL ||
+                   type == TokenType::BOOL_LITERAL ||
+                   type == TokenType::IDENTIFIER) {
+            out << ind << "std::cout << " << val << " << std::endl;\n";
+        } else {
+            out << ind << "// unsupported print token: " << val << "\n";
+        }
+    }
     return out.str();
 }
 
@@ -56,6 +73,7 @@ std::string generateExpression(ParserNode* node) {
     else if (auto boolean = dynamic_cast<BooleanNode*>(node)) {
         return boolean->value ? "true" : "false";
     }
+    
     return "";
 }
 

@@ -162,5 +162,16 @@ int main()
     outputFile.close();
     std::cout << "C++ code written to generated.cpp\n";
 
+    // Compile the generated file
+    int compileStatus = system("g++ generated.cpp -o generated_output");
+    if (compileStatus != 0) {
+        std::cerr << "Compilation failed!\n";
+    } else {
+        std::cout << "Running generated program:\n\n";
+        std::cout << "\n\n\n\n==================================\n\n\n\n";
+        system("generated_output.exe");
+        std::cout << "\n\nEnd of file!\n\n==================================\n\n\n\n";
+    }
+
     return 0;
 }
