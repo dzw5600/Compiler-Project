@@ -8,6 +8,7 @@
 #include <cctype>
 #include "tokenizer.h"
 #include "parser.h"
+#include "semanticAnalyzer.h" 
 #include "codegenerator.h"
 
 int main(int argc, char* argv[]) {
@@ -134,6 +135,9 @@ int main(int argc, char* argv[]) {
 
     Parser parser(tokens);
     std::vector<ParserNode *> parserNodes = parser.parse();
+
+    SemanticAnalyzer sem;
+    sem.analyze(parserNodes);
 
     for (ParserNode *node : parserNodes)
     {
