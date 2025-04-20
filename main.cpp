@@ -8,6 +8,7 @@
 #include <cctype>
 #include "tokenizer.h"
 #include "parser.h"
+#include "codegenerator.h"
 
 int main()
 {
@@ -128,8 +129,38 @@ int main()
     for (ParserNode *node : parserNodes)
     {
         node->print();
+        
         std::cout << std::endl;
     }
+    std::cout << "Beginning code generation: \n\n\n";
+    // Code generation time!
+    std::ofstream outputFile("generated.cpp");
+    if (!outputFile.is_open()) {
+        std::cerr << "Failed to open output file for writing.\n";
+        return 1;
+    }
+
+    outputFile << "#include <iostream>\n\n";
+    outputFile << "int main() {\n";
+
+    for (ParserNode *node : parserNodes)
+    {
+        std::string generated = generateCode(node);
+        // Strip main() header and footer if included
+        size_t bodyStart = generated.find("{");
+        size_t bodyEnd = generated.rfind("return 0;");
+        if (bodyStart != std::string::npos && bodyEnd != std::string::npos) {
+            std::string body = generated.substr(bodyStart + 1, bodyEnd - bodyStart - 1);
+            outputFile << body << "\n";
+        } else {
+            outputFile << "    // Code generation failed for this node\n";
+        }
+    }
+
+    outputFile << "    return 0;\n";
+    outputFile << "}\n";
+    outputFile.close();
+    std::cout << "C++ code written to generated.cpp\n";
 
     return 0;
 }
