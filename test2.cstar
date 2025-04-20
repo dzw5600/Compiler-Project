@@ -1,0 +1,23 @@
+// test.cstar example
+
+/* Multi-line
+   comment test */
+
+int count;
+int result;
+float pi;
+string helloWorld;
+bool myBool;
+char bleh;
+double d;
+
+set count = 10;
+set pi = 3.14f;
+set helloWorld = "Hello, World!";
+set myBool = true;
+
+print(helloWorld);
+print(myBool);
+print(pi);
+print(count);
+

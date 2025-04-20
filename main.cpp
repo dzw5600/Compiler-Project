@@ -10,9 +10,18 @@
 #include "parser.h"
 #include "codegenerator.h"
 
-int main()
-{
-    std::ifstream myfile("test.cstar");
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cerr << "No input file detected!!\n";
+        return 1;
+    }
+
+    std::ifstream myfile(argv[1]);
+    if (!myfile.is_open()) {
+        std::cerr << "Failed to open file: " << argv[1] << "\n";
+        return 1;
+    }
+
     Tokenizer tokenizer(myfile);
     Token token;
 
