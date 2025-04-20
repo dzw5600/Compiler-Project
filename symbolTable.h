@@ -1,4 +1,3 @@
-// symbolTable.h  (replace existing)  :contentReference[oaicite:0]{index=0}
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
