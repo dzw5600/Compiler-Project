@@ -5,6 +5,7 @@
 #include "parser.h"
 
 // Generate C++ code from a parsed syntax tree
+
 std::string generateCode(ParserNode *node);
 
 #endif // CODE_GENERATOR_H

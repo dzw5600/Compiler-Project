@@ -11,7 +11,7 @@ while(count <= 20)
    {
       print("FizzBuzz");
    }
-   else if(count % 3 = 0)
+   elif(count % 3 = 0)
    {
       print("Fizz");
    }

@@ -815,7 +815,7 @@ IfNode* Parser::parseIf()
 {
     debugPrint("Parsing if statement", 1);
 
-    if (tokens[index].text != "if")
+    if (tokens[index].text != "if" && tokens[index].text != "elif")
     {
         std::cerr << "Unable to parse if statement\n";
         return nullptr;
@@ -854,7 +854,11 @@ IfNode* Parser::parseIf()
             elseBranch = parseBlock();  // regular else block
         }
     }
-
+    else if (tokens[index].text == "elif")
+    {
+        debugPrint("Parsing 'elif' branch", 2);
+        elseBranch.push_back(parseIf()); 
+    }
     debugPrint("If statement complete", 1);
     return new IfNode(condition, thenBranch, elseBranch);
 }

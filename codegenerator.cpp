@@ -30,12 +30,18 @@ std::string generateStatement(ParserNode* node, int indent = 0) {
         out << ind << "}\n";
 
         // else branch
-        if (!ifNode->elseBranch.empty()) {
-            out << ind << "else {\n";
-            for (auto stmt : ifNode->elseBranch) {
-                out << generateStatement(stmt, indent + 4);
+        if (!ifNode->elseBranch.empty()) 
+        {
+            // Check if it's a chained if
+            if (ifNode->elseBranch.size() == 1 && dynamic_cast<IfNode*>(ifNode->elseBranch[0])) {
+                out << ind << "else " << generateStatement(ifNode->elseBranch[0], indent);
+            } else {
+                out << ind << "else {\n";
+                for (auto stmt : ifNode->elseBranch) {
+                    out << generateStatement(stmt, indent + 4);
+                }
+                out << ind << "}\n";
             }
-            out << ind << "}\n";
         }
     }
     else if (auto print = dynamic_cast<PrintNode*>(node)) {
