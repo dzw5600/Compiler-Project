@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo Compiling the compiler...
-g++ main.cpp codegenerator.cpp parser.cpp tokenizer.cpp -o compiler
+g++ main.cpp codegenerator.cpp parser.cpp tokenizer.cpp semanticAnalyzer.cpp -o compiler
 if errorlevel 1 (
     echo Compilation failed!
     pause

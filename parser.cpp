@@ -476,7 +476,8 @@ std::vector<ParserNode*> Parser::parse()
 
 ParserNode* Parser::parseFunctionDeclaration() 
 {
-
+    // not implemented
+    return nullptr;
 }
 
 WhileLoopNode::WhileLoopNode(ParserNode* condition, std::vector<ParserNode*> statements) : condition(condition) 

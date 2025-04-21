@@ -10,6 +10,7 @@
 struct Symbol {
     std::string type;
     std::string name;
+    Symbol() : type(""), name("") {}
     Symbol(const std::string &type, const std::string &name)
       : type(type), name(name) {}
 };
