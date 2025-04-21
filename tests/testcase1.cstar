@@ -1,7 +1,10 @@
-// Declare two integers, assign and print
-int a;
+// Basic tests:
+// 1. Declaration of variables (assignment immediately, and reassignment using `set`)
+// 2. Addition
+// 3. Print statements
+
+int a = 5;
 int b;
-set a = 5;
 set b = a + 10;
 print(a);
 print(b);

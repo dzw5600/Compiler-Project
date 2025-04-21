@@ -2,11 +2,9 @@
 
 int main() {
 
-    int a;
+    int a = 5;
     
     int b;
-    
-    a = 5;
     
     b = (a + 10);
     

@@ -1,0 +1,25 @@
+// Testing switch statements and for loops (TODO):
+// 1. Switch statement
+// 2. Break keyword optional
+// 3. Strings and chars
+// Variable incrementing
+
+int i = 0;
+
+while (i < 5)
+{
+    switch (i)
+    {
+        case (0):
+            print('0'); // char
+        case (1):
+            print("one"); // string
+            break;
+        default:
+            break;
+    }
+
+    set i = i + 1;
+}
+
+print("All done!");
