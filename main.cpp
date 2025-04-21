@@ -6,9 +6,9 @@
 #include <set>
 #include <algorithm>
 #include <cctype>
+#include "semanticAnalyzer.h" 
 #include "tokenizer.h"
 #include "parser.h"
-#include "semanticAnalyzer.h" 
 #include "codegenerator.h"
 
 int main(int argc, char* argv[]) {
@@ -139,6 +139,7 @@ int main(int argc, char* argv[]) {
     SemanticAnalyzer sem;
     sem.analyze(parserNodes);
 
+
     for (ParserNode *node : parserNodes)
     {
         node->print();
@@ -147,7 +148,11 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "Beginning code generation: \n\n\n";
     // Code generation time!
-    std::ofstream outputFile("generated.cpp");
+    std::string inputFilename(argv[1]);
+    std::string outputCpp = "!"+inputFilename.substr(0, inputFilename.find_last_of('.')) + "_output.cpp";
+    std::ofstream outputFile(outputCpp);
+
+
     if (!outputFile.is_open()) {
         std::cerr << "Failed to open output file for writing.\n";
         return 1;
@@ -173,10 +178,11 @@ int main(int argc, char* argv[]) {
     outputFile << "    return 0;\n";
     outputFile << "}\n";
     outputFile.close();
-    std::cout << "C++ code written to generated.cpp\n";
+    std::cout << "C++ code written to .cpp\n";
 
     // Compile the generated file
-    int compileStatus = system("g++ generated.cpp -o generated_output");
+    std::string compileCommand = "g++ " + outputCpp + " -o generated_output";
+    int compileStatus = system(compileCommand.c_str());
     if (compileStatus != 0) {
         std::cerr << "Compilation failed!\n";
     } else {

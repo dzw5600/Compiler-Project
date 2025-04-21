@@ -337,7 +337,7 @@ std::string OperatorNode::getOperatorString()
     }
     else if (type == OperatorType::Equal)
     {
-        return "=";
+        return "==";
     }
     else if (type == OperatorType::NotEqual)
     {
@@ -511,31 +511,29 @@ void WhileLoopNode::print(int indent)
     }
 }
 
-ParserNode *Parser::parseWhileLoop() {
+ParserNode* Parser::parseWhileLoop() {
     index++;
-    if (tokens[index].text != "(")
-    {
-        std::cerr << "Expected '('\n";
-    }
-    ParserNode *condition = Parser::expression(); 
-    if (tokens[index].text != ")")
-    {
-        std::cerr << "Expected ')'\n";
-        return nullptr;
-    }
 
-    if (tokens[index].text != "{")
-    {
-        std::cerr << "Expected '{'\n";
+    if (tokens[index].text != "(") {
+        std::cerr << "Expected '(' after 'while'\n";
         return nullptr;
-    }
-    std::vector<ParserNode*> body;
-    while (tokens[index].text != "}")
-    {
-        body.push_back(parseStatement());
     }
     index++;
 
+    ParserNode* condition = logic();
+
+    if (tokens[index].text != ")") {
+        std::cerr << "Expected ')' after while condition\n";
+        return nullptr;
+    }
+    index++;
+
+    if (tokens[index].text != "{") {
+        std::cerr << "Expected '{' to start while body\n";
+        return nullptr;
+    }
+
+    std::vector<ParserNode*> body = parseBlock();
     return new WhileLoopNode(condition, body);
 }
 
@@ -564,9 +562,22 @@ ParserNode* Parser::parseSwitch() {
     while (tokens[index].text != "}") {
         if (tokens[index].text == "case") {
             index++; // skip 'case'
-            ParserNode* value = expression();
+            if (tokens[index].text != "(") {
+                std::cerr << "Expected '(' after case\n";
+                return nullptr;
+            }
+            index++; // skip '('
+
+            ParserNode* value = logic(); // supports &&, =, etc.
+
+            if (tokens[index].text != ")") {
+                std::cerr << "Expected ')' after case condition\n";
+                return nullptr;
+            }
+            index++; // skip ')'
+
             if (tokens[index].text != ":") {
-                std::cerr << "Expected ':' after case value\n";
+                std::cerr << "Expected ':' after case(...)\n";
                 return nullptr;
             }
             index++;
@@ -837,7 +848,11 @@ IfNode* Parser::parseIf()
     {
         debugPrint("Parsing 'else' branch", 2);
         index++;
-        elseBranch = parseBlock();
+        if (tokens[index].text == "if") {
+            elseBranch.push_back(parseIf());  // recursive call for else-if
+        } else {
+            elseBranch = parseBlock();  // regular else block
+        }
     }
 
     debugPrint("If statement complete", 1);
@@ -921,7 +936,7 @@ ParserNode* Parser::term()
     ParserNode *left = factor();
     OperatorNode *op; 
     ParserNode *right;
-    while (tokens[index].type == TokenType::OPERATOR && (tokens[index].text == "*" || tokens[index].text == "/"))
+    while (tokens[index].type == TokenType::OPERATOR && (tokens[index].text == "*" || tokens[index].text == "/" || tokens[index].text == "%"))
     {
         op = new OperatorNode(tokens[index]);
         index++;
