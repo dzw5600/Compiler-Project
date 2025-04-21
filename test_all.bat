@@ -42,13 +42,14 @@ if errorlevel 1 (
   goto :EOF
 )
 
-set "GEN_CPP=%FNAME%_output.cpp"
+rem 2) locate the generated C++ in tests\ with a leading underscore
+set "GEN_CPP=%TESTDIR%\_%FNAME%_output.cpp"
 if not exist "%GEN_CPP%" (
   echo   [FAIL] missing generated C++: %GEN_CPP%
   goto :EOF
 )
 
-rem 2) compile generated C++
+rem 3) compile the generated C++
 g++ -std=c++11 "%GEN_CPP%" -o "%TMPDIR%\%FNAME%.exe" >"%TMPDIR%\build.log" 2>&1
 if errorlevel 1 (
   echo   [FAIL] generated code failed to compile
@@ -56,10 +57,10 @@ if errorlevel 1 (
   goto :EOF
 )
 
-rem 3) run it
+rem 4) run it
 "%TMPDIR%\%FNAME%.exe" >"%TMPDIR%\run.log"
 
-rem 4) compare to expected
+rem 5) compare to expected
 set "EXPECT=%EXPDIR%\%FNAME%.expected"
 if not exist "%EXPECT%" (
   echo   [WARN] no expected output for %FNAME%

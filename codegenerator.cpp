@@ -22,19 +22,21 @@ std::string generateStatement(ParserNode* node, int indent = 0) {
         out << ind << assign->var->name << " = " << generateExpression(assign->value) << ";\n";
     }
     else if (auto ifNode = dynamic_cast<IfNode*>(node)) {
+        // if statement
         out << ind << "if (" << generateExpression(ifNode->condition) << ") {\n";
         for (auto stmt : ifNode->thenBranch) {
             out << generateStatement(stmt, indent + 4);
         }
-        out << ind << "}";
+        out << ind << "}\n";
+
+        // else branch
         if (!ifNode->elseBranch.empty()) {
-            out << " else {\n";
+            out << ind << "else {\n";
             for (auto stmt : ifNode->elseBranch) {
                 out << generateStatement(stmt, indent + 4);
             }
-            out << ind << "}";
+            out << ind << "}\n";
         }
-        out << "\n"; // Single newline after entire if/else block
     }
     else if (auto print = dynamic_cast<PrintNode*>(node)) {
         const std::string& val = print->token.text;

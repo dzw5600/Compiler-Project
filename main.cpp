@@ -187,13 +187,14 @@ int main(int argc, char* argv[]) {
         size_t bodyEnd = generated.rfind("return 0;");
         if (bodyStart != std::string::npos && bodyEnd != std::string::npos) {
             std::string body = generated.substr(bodyStart + 1, bodyEnd - bodyStart - 1);
-            outputFile << body << "\n";
+            // outputFile << body << "\n";
+            outputFile << body;
         } else {
             outputFile << "    // Code generation failed for this node\n";
         }
     }
 
-    outputFile << "    return 0;\n";
+    outputFile << "return 0;\n";
     outputFile << "}\n";
     outputFile.close();
     std::cout << "C++ code written to: " << outputCpp << std::endl;
