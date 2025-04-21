@@ -1,11 +1,11 @@
 // Test fizzbuzz program:
 // 1. While loops
-// 2. If/elif/else code blocks
+// 2. If/else if/elif/else code blocks
 // 3. Operators like modulus, equality comparison (single `=` for equality), boolean comparison
 
 int count = 0;
 
-while(count <= 20)
+while(count < 26)
 {
    if(count % 3 = 0 && count % 5 = 0)
    {
@@ -15,7 +15,7 @@ while(count <= 20)
    {
       print("Fizz");
    }
-   else if(count % 5 = 0)
+   elif(count % 5 = 0)
    {
       print("Buzz");
    }
