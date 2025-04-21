@@ -33,6 +33,7 @@ set result = 5;
 if (result = 5)
 {
     // blah
+    print("blah");
     print(result);
 }
 set d = .5; // Test starting with .
