@@ -139,19 +139,37 @@ int main(int argc, char* argv[]) {
     SemanticAnalyzer sem;
     sem.analyze(parserNodes);
 
-
     for (ParserNode *node : parserNodes)
     {
         node->print();
-        
         std::cout << std::endl;
     }
+
     std::cout << "Beginning code generation: \n\n\n";
+
     // Code generation time!
     std::string inputFilename(argv[1]);
-    std::string outputCpp = "!"+inputFilename.substr(0, inputFilename.find_last_of('.')) + "_output.cpp";
-    std::ofstream outputFile(outputCpp);
 
+    size_t slash = inputFilename.find_last_of("\\/");
+    std::string dir, filename;
+    if (slash == std::string::npos)
+    {
+        dir = "";
+        filename = inputFilename;
+    }
+    else
+    {
+        dir = inputFilename.substr(0, slash + 1); // e.g. "tests\"
+        filename = inputFilename.substr(slash + 1); // e.g. "testcase1.cstar"
+    }
+
+    size_t dot = filename.find_last_of('.');
+    std::string base = (dot == std::string::npos) ? filename : filename.substr(0, dot);
+
+    // Prepend "_" to the basename, append "_output.cpp", and rejoin
+    std::string outputCpp = dir + "_" + base + "_output.cpp";
+
+    std::ofstream outputFile(outputCpp);
 
     if (!outputFile.is_open()) {
         std::cerr << "Failed to open output file for writing.\n";
@@ -178,7 +196,7 @@ int main(int argc, char* argv[]) {
     outputFile << "    return 0;\n";
     outputFile << "}\n";
     outputFile.close();
-    std::cout << "C++ code written to .cpp\n";
+    std::cout << "C++ code written to: " << outputCpp << std::endl;
 
     // Compile the generated file
     std::string compileCommand = "g++ " + outputCpp + " -o generated_output";

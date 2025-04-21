@@ -1,0 +1,7 @@
+// Declare two integers, assign and print
+int a;
+int b;
+set a = 5;
+set b = a + 10;
+print(a);
+print(b);
